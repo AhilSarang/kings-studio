@@ -1,0 +1,17 @@
+{
+  "name": "kings-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Your own image and video studio: FLUX 3, Nano Banana Pro / 2 and Seedance 2.5 through fal.ai, pay per generation.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fal-ai/client": "^1.10.1"
+  }
+}

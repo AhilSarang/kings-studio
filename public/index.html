@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kings Studio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23c6ff3d'/><path d='M9 23V9h3.2v5.6L17 9h3.9l-5.4 6.2L21.3 23h-4l-4-5.6-1.1 1.2V23z' fill='%230b0b0f'/></svg>">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="logo">K</span><span>Kings Studio</span></div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="image" aria-selected="true">Image</button>
+      <button role="tab" data-tab="video" aria-selected="false">Video</button>
+      <button role="tab" data-tab="ugc" aria-selected="false">UGC</button>
+    </nav>
+    <div class="top-right">
+      <span class="spend" id="spend" title="Estimated from fal.ai's published prices. Your fal.ai dashboard has the exact amount.">This month ≈ $0.00</span>
+      <button class="icon-btn" id="settingsBtn" title="API key" aria-label="API key settings">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m10.85 12.15 8.65-8.65M18 5l2 2M15 8l2 2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel" id="panel">
+      <section class="block" id="modelBlock">
+        <div class="label">Model</div>
+        <div class="model-list" id="modelList"></div>
+      </section>
+
+      <section class="block" id="promptBlock">
+        <div class="label-row">
+          <label class="label" for="prompt">Prompt</label>
+          <span class="hint">⌘ Enter to generate</span>
+        </div>
+        <textarea id="prompt" rows="5" spellcheck="true"></textarea>
+      </section>
+
+      <section class="block" id="refsBlock">
+        <div class="label-row">
+          <span class="label">Reference images</span>
+          <span class="hint" id="refsHint"></span>
+        </div>
+        <div class="refs" id="refs"></div>
+      </section>
+
+      <section class="block" id="framesBlock" hidden>
+        <div class="label-row">
+          <span class="label">Animate an image</span>
+          <span class="hint">optional</span>
+        </div>
+        <div class="frames">
+          <div class="frame-slot" data-slot="startFrame"></div>
+          <div class="frame-slot" data-slot="endFrame"></div>
+        </div>
+      </section>
+
+      <section class="block settings" id="settings"></section>
+
+      <div class="ugc-panel" id="ugcPanel" hidden>
+        <section class="block">
+          <div class="label-row">
+            <span class="label">Your product</span>
+            <span class="hint">1–3 clear photos</span>
+          </div>
+          <div class="refs" id="ugcProduct"></div>
+          <input class="field" id="ugcName" placeholder="Product name, e.g. Glow Serum" autocomplete="off">
+          <input class="field" id="ugcBenefit" placeholder="What it does, e.g. keeps your skin hydrated all day" autocomplete="off">
+        </section>
+
+        <section class="block">
+          <div class="label-row">
+            <span class="label">Creator</span>
+            <span class="hint">AI person, or add a face</span>
+          </div>
+          <div class="chips" id="ugcCreatorChips"></div>
+          <div class="creator-row">
+            <input class="field" id="ugcCreator" autocomplete="off">
+            <div id="ugcFace"></div>
+          </div>
+        </section>
+
+        <section class="block">
+          <span class="label">Setting</span>
+          <div class="chips" id="ugcSetting"></div>
+        </section>
+
+        <section class="block">
+          <span class="label">Format</span>
+          <div class="chips" id="ugcFormat"></div>
+        </section>
+
+        <section class="block">
+          <div class="label-row">
+            <label class="label" for="ugcScript">What they say</label>
+            <button class="mini" id="ugcIdeas" type="button">✦ Script idea</button>
+          </div>
+          <textarea id="ugcScript" rows="4" placeholder="Write what the creator says, or tap Script idea. Any language works."></textarea>
+          <span class="hint" id="ugcScriptInfo"></span>
+        </section>
+
+        <section class="block">
+          <span class="label">Video model</span>
+          <div class="model-list" id="ugcModel"></div>
+          <div class="chips" id="ugcRes"></div>
+        </section>
+      </div>
+
+      <div class="generate-bar">
+        <div class="form-error" id="formError" role="alert"></div>
+        <button class="generate" id="generateBtn">
+          <span>Generate</span><span class="cost" id="cost"></span>
+        </button>
+      </div>
+    </aside>
+
+    <section class="gallery-wrap">
+      <div class="gallery-head">
+        <div class="filters" role="group" aria-label="Filter">
+          <button data-filter="all" aria-pressed="true">All</button>
+          <button data-filter="image" aria-pressed="false">Images</button>
+          <button data-filter="video" aria-pressed="false">Videos</button>
+          <button data-filter="ugc" aria-pressed="false">UGC</button>
+        </div>
+        <span class="hint" id="count"></span>
+      </div>
+      <div class="gallery" id="gallery"></div>
+      <div class="empty" id="empty" hidden>
+        <div class="empty-mark">✦</div>
+        <p>Your generations show up here.</p>
+        <p class="hint">Everything is saved to the <code>outputs</code> folder.</p>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="viewer" id="viewer">
+    <div class="viewer-media" id="viewerMedia"></div>
+    <aside class="viewer-side">
+      <div class="viewer-top">
+        <div>
+          <div class="viewer-model" id="viewerModel"></div>
+          <div class="hint" id="viewerMeta"></div>
+        </div>
+        <button class="icon-btn" data-close aria-label="Close">✕</button>
+      </div>
+      <p class="viewer-prompt" id="viewerPrompt"></p>
+      <div class="viewer-tags" id="viewerTags"></div>
+      <div class="viewer-actions" id="viewerActions"></div>
+    </aside>
+    <button class="nav prev" id="prevBtn" aria-label="Previous">‹</button>
+    <button class="nav next" id="nextBtn" aria-label="Next">›</button>
+  </dialog>
+
+  <dialog class="key-dialog" id="keyDialog">
+    <form method="dialog" id="keyForm">
+      <h2>Connect fal.ai</h2>
+      <p>Kings Studio runs every model through <a href="https://fal.ai" target="_blank" rel="noopener">fal.ai</a> except "Seedance 2.5 · Replicate", which uses your Replicate token (the <b>Replicate key…</b> button below). You pay only for what you generate, with no subscription.</p>
+      <ol>
+        <li>Sign in at <a href="https://fal.ai/dashboard/keys" target="_blank" rel="noopener">fal.ai/dashboard/keys</a> and create an API key.</li>
+        <li>Add a few dollars at <a href="https://fal.ai/dashboard/billing" target="_blank" rel="noopener">fal.ai/dashboard/billing</a>.</li>
+        <li>Paste the key below. It's saved only on this computer.</li>
+      </ol>
+      <input type="password" id="keyInput" placeholder="Paste your fal.ai key" autocomplete="off" required>
+      <div class="form-error" id="keyError" role="alert"></div>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="replicateSwitch">Replicate key…</button>
+        <button type="button" class="ghost" id="keyCancel">Cancel</button>
+        <button type="submit" class="primary">Save key</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="key-dialog" id="replicateDialog">
+    <form method="dialog" id="replicateForm">
+      <h2>Connect Replicate</h2>
+      <p>The "Seedance 2.5 · Replicate" model runs on <a href="https://replicate.com" target="_blank" rel="noopener">Replicate</a>, which sells it at ByteDance's own price, about half of fal's. Everything else keeps using fal.ai.</p>
+      <ol>
+        <li>Sign in at <a href="https://replicate.com/account/api-tokens" target="_blank" rel="noopener">replicate.com/account/api-tokens</a> and create a token.</li>
+        <li>Add a payment method or credit at <a href="https://replicate.com/account/billing" target="_blank" rel="noopener">replicate.com/account/billing</a>.</li>
+        <li>Paste the token below. It's checked with Replicate and saved only on this computer.</li>
+      </ol>
+      <input type="password" id="replicateInput" placeholder="Paste your Replicate API token" autocomplete="off" required>
+      <div class="form-error" id="replicateError" role="alert"></div>
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="replicateCancel">Cancel</button>
+        <button type="submit" class="primary">Save token</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+  <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
